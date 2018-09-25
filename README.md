@@ -2,13 +2,12 @@
 
 Objective --
 
- Optimization decisions making for firefighters 
+ + Optimization decisions making for firefighters 
 
 Members --
- Lounes Hamla (France)
- Thibaud Formond (France) 
- Mathieu Laurent (France)
- Vincent Becquerelle (France)
- Sebi Fertier (France)
- + (France)
- Hyunjae Lee (South Korea)
+ + Lounes Hamla (France)
+ + Thibaud Formond (France) 
+ + Mathieu Laurent (France)
+ + Vincent Becquerelle (France)
+ + Sebi Fertier (France)
+ + Hyunjae Lee (South Korea)
