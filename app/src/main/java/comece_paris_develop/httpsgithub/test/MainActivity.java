@@ -56,8 +56,8 @@ public class MainActivity extends AppCompatActivity
     private static final String TAG = "googlemap_example";
     private static final int GPS_ENABLE_REQUEST_CODE = 2001;
     private static final int PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION = 2002;
-    private static final int UPDATE_INTERVAL_MS = 1000;  // 1초
-    private static final int FASTEST_UPDATE_INTERVAL_MS = 500; // 0.5초
+    private static final int UPDATE_INTERVAL_MS = 1000;  // 1 second
+    private static final int FASTEST_UPDATE_INTERVAL_MS = 500; // 0.5 second
 
     private AppCompatActivity mActivity;
     boolean askPermissionOnceAgain = false;
@@ -75,6 +75,8 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        // 화면이 세로모드<-> 가로모드 전환시 onCreate가 다시 호출됨 , 변경된 값 유지를 위해 사용.
+        // when the screen is rotated, the function "onCreated" is called. so it keeps changed values.
         super.onCreate(savedInstanceState);
 
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON,
@@ -92,7 +94,8 @@ public class MainActivity extends AppCompatActivity
                 .addApi(LocationServices.API)
                 .build();
 
-
+        //Fragment는 Activity에 배치되는 화면 및 동작의 조각
+        
         MapFragment mapFragment = (MapFragment) getFragmentManager()
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
@@ -199,7 +202,7 @@ public class MainActivity extends AppCompatActivity
             @Override
             public void onCameraMoveStarted(int i) {
 
-                if (mMoveMapByUser == true && mRequestingLocationUpdates){
+                if (mMoveMapByUser && mRequestingLocationUpdates){
 
                     Log.d(TAG, "onCameraMove : 위치에 따른 카메라 이동 비활성화");
                     mMoveMapByAPI = false;
@@ -245,7 +248,7 @@ public class MainActivity extends AppCompatActivity
     @Override
     protected void onStart() {
 
-        if(mGoogleApiClient != null && mGoogleApiClient.isConnected() == false){
+        if(mGoogleApiClient != null && !mGoogleApiClient.isConnected()){
 
             Log.d(TAG, "onStart: mGoogleApiClient connect");
             mGoogleApiClient.connect();
@@ -277,7 +280,7 @@ public class MainActivity extends AppCompatActivity
     public void onConnected(Bundle connectionHint) {
 
 
-        if ( mRequestingLocationUpdates == false ) {
+        if (!mRequestingLocationUpdates) {
 
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
 
@@ -309,7 +312,7 @@ public class MainActivity extends AppCompatActivity
 
 
     @Override
-    public void onConnectionFailed(ConnectionResult connectionResult) {
+    public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
 
         Log.d(TAG, "onConnectionFailed");
         setDefaultLocation();
@@ -359,7 +362,7 @@ public class MainActivity extends AppCompatActivity
 
         } else {
             Address address = addresses.get(0);
-            return address.getAddressLine(0).toString();
+            return address.getAddressLine(0);
         }
 
     }
@@ -368,6 +371,7 @@ public class MainActivity extends AppCompatActivity
     public boolean checkLocationServicesStatus() {
         LocationManager locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
 
+        assert locationManager != null;
         return locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)
                 || locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER);
     }
@@ -391,7 +395,7 @@ public class MainActivity extends AppCompatActivity
 
         //구글맵의 디폴트 현재 위치는 파란색 동그라미로 표시
         //마커를 원하는 이미지로 변경하여 현재 위치 표시하도록 수정 fix - 2017. 11.27
-        markerOptions.icon(BitmapDescriptorFactory.fromResource(R.mipmap.ic_launcher));
+       // markerOptions.icon(BitmapDescriptorFactory.fromResource(R.mipmap.ic_launcher));
 
         currentMarker = mGoogleMap.addMarker(markerOptions);
 
@@ -413,7 +417,7 @@ public class MainActivity extends AppCompatActivity
 
 
         //디폴트 위치, Seoul
-        LatLng DEFAULT_LOCATION = new LatLng(37.56, 126.97);
+        LatLng DEFAULT_LOCATION = new LatLng(48.8, 2.4);
         String markerTitle = "위치정보 가져올 수 없음";
         String markerSnippet = "위치 퍼미션과 GPS 활성 요부 확인하세요";
 
@@ -447,8 +451,7 @@ public class MainActivity extends AppCompatActivity
                 .PERMISSION_DENIED && fineLocationRationale)
             showDialogForPermission("앱을 실행하려면 퍼미션을 허가하셔야합니다.");
 
-        else if (hasFineLocationPermission
-                == PackageManager.PERMISSION_DENIED && !fineLocationRationale) {
+        else if (hasFineLocationPermission == PackageManager.PERMISSION_DENIED) {
             showDialogForPermissionSetting("퍼미션 거부 + Don't ask again(다시 묻지 않음) " +
                     "체크 박스를 설정한 경우로 설정에서 퍼미션 허가해야합니다.");
         } else if (hasFineLocationPermission == PackageManager.PERMISSION_GRANTED) {
@@ -456,7 +459,7 @@ public class MainActivity extends AppCompatActivity
 
             Log.d(TAG, "checkPermissions : 퍼미션 가지고 있음");
 
-            if ( mGoogleApiClient.isConnected() == false) {
+            if (!mGoogleApiClient.isConnected()) {
 
                 Log.d(TAG, "checkPermissions : 퍼미션 가지고 있음");
                 mGoogleApiClient.connect();
@@ -477,7 +480,7 @@ public class MainActivity extends AppCompatActivity
             if (permissionAccepted) {
 
 
-                if ( mGoogleApiClient.isConnected() == false) {
+                if (!mGoogleApiClient.isConnected()) {
 
                     Log.d(TAG, "onRequestPermissionsResult : mGoogleApiClient connect");
                     mGoogleApiClient.connect();
@@ -584,7 +587,7 @@ public class MainActivity extends AppCompatActivity
                         Log.d(TAG, "onActivityResult : 퍼미션 가지고 있음");
 
 
-                        if ( mGoogleApiClient.isConnected() == false ) {
+                        if (!mGoogleApiClient.isConnected()) {
 
                             Log.d( TAG, "onActivityResult : mGoogleApiClient connect ");
                             mGoogleApiClient.connect();
