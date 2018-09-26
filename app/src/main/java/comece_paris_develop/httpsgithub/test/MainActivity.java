@@ -95,7 +95,7 @@ public class MainActivity extends AppCompatActivity
                 .build();
 
         //Fragment는 Activity에 배치되는 화면 및 동작의 조각
-        
+
         MapFragment mapFragment = (MapFragment) getFragmentManager()
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
@@ -235,8 +235,8 @@ public class MainActivity extends AppCompatActivity
         Log.d(TAG, "onLocationChanged : ");
 
         String markerTitle = getCurrentAddress(currentPosition);
-        String markerSnippet = "위도:" + String.valueOf(location.getLatitude())
-                + " 경도:" + String.valueOf(location.getLongitude());
+        String markerSnippet = "Latitude:" + String.valueOf(location.getLatitude())
+                + "Longitude:" + String.valueOf(location.getLongitude());
 
         //현재 위치에 마커 생성하고 이동
         setCurrentLocation(location, markerTitle, markerSnippet);
@@ -295,7 +295,7 @@ public class MainActivity extends AppCompatActivity
 
                 } else {
 
-                    Log.d(TAG, "onConnected : 퍼미션 가지고 있음");
+                    Log.d(TAG, "onConnected : has a permission");
                     Log.d(TAG, "onConnected : call startLocationUpdates");
                     startLocationUpdates();
                     mGoogleMap.setMyLocationEnabled(true);
@@ -449,7 +449,7 @@ public class MainActivity extends AppCompatActivity
 
         if (hasFineLocationPermission == PackageManager
                 .PERMISSION_DENIED && fineLocationRationale)
-            showDialogForPermission("앱을 실행하려면 퍼미션을 허가하셔야합니다.");
+            showDialogForPermission("If you still want to run the app, you should accept the permission.");
 
         else if (hasFineLocationPermission == PackageManager.PERMISSION_DENIED) {
             showDialogForPermissionSetting("퍼미션 거부 + Don't ask again(다시 묻지 않음) " +
@@ -457,11 +457,11 @@ public class MainActivity extends AppCompatActivity
         } else if (hasFineLocationPermission == PackageManager.PERMISSION_GRANTED) {
 
 
-            Log.d(TAG, "checkPermissions : 퍼미션 가지고 있음");
+            Log.d(TAG, "checkPermissions : has a permission");
 
             if (!mGoogleApiClient.isConnected()) {
 
-                Log.d(TAG, "checkPermissions : 퍼미션 가지고 있음");
+                Log.d(TAG, "checkPermissions : has a permission");
                 mGoogleApiClient.connect();
             }
         }
@@ -500,10 +500,10 @@ public class MainActivity extends AppCompatActivity
     private void showDialogForPermission(String msg) {
 
         AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
-        builder.setTitle("알림");
+        builder.setTitle("Notification");
         builder.setMessage(msg);
         builder.setCancelable(false);
-        builder.setPositiveButton("예", new DialogInterface.OnClickListener() {
+        builder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int id) {
                 ActivityCompat.requestPermissions(mActivity,
                         new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION},
@@ -511,7 +511,7 @@ public class MainActivity extends AppCompatActivity
             }
         });
 
-        builder.setNegativeButton("아니오", new DialogInterface.OnClickListener() {
+        builder.setNegativeButton("No", new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int id) {
                 finish();
             }
@@ -522,10 +522,10 @@ public class MainActivity extends AppCompatActivity
     private void showDialogForPermissionSetting(String msg) {
 
         AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
-        builder.setTitle("알림");
+        builder.setTitle("Notification");
         builder.setMessage(msg);
         builder.setCancelable(true);
-        builder.setPositiveButton("예", new DialogInterface.OnClickListener() {
+        builder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int id) {
 
                 askPermissionOnceAgain = true;
@@ -537,7 +537,7 @@ public class MainActivity extends AppCompatActivity
                 mActivity.startActivity(myAppSettings);
             }
         });
-        builder.setNegativeButton("아니오", new DialogInterface.OnClickListener() {
+        builder.setNegativeButton("No", new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int id) {
                 finish();
             }
@@ -550,11 +550,11 @@ public class MainActivity extends AppCompatActivity
     private void showDialogForLocationServiceSetting() {
 
         AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
-        builder.setTitle("위치 서비스 비활성화");
-        builder.setMessage("앱을 사용하기 위해서는 위치 서비스가 필요합니다.\n"
-                + "위치 설정을 수정하실래요?");
+        builder.setTitle("Disabled the location service");
+        builder.setMessage("If you still want to use this app, it needs the location service.\n"
+                + "Please check your location setting out");
         builder.setCancelable(true);
-        builder.setPositiveButton("설정", new DialogInterface.OnClickListener() {
+        builder.setPositiveButton("setting", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int id) {
                 Intent callGPSSettingIntent
@@ -562,7 +562,7 @@ public class MainActivity extends AppCompatActivity
                 startActivityForResult(callGPSSettingIntent, GPS_ENABLE_REQUEST_CODE);
             }
         });
-        builder.setNegativeButton("취소", new DialogInterface.OnClickListener() {
+        builder.setNegativeButton("cancel", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int id) {
                 dialog.cancel();
