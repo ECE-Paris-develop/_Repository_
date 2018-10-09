@@ -19,7 +19,10 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
 import android.view.WindowManager;
+import android.widget.Button;
+import android.widget.EditText;
 import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
@@ -52,6 +55,9 @@ public class MainActivity extends AppCompatActivity
     private GoogleApiClient mGoogleApiClient = null;
     private GoogleMap mGoogleMap = null;
     private Marker currentMarker = null;
+    private Geocoder geocoder;
+    private Button button;
+    private EditText editText;
 
     private static final String TAG = "googlemap_example";
     private static final int GPS_ENABLE_REQUEST_CODE = 2001;
@@ -83,6 +89,8 @@ public class MainActivity extends AppCompatActivity
                 WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
         setContentView(R.layout.activity_main);
 
+        editText = (EditText)findViewById(R.id.editText);
+        button = (Button)findViewById(R.id.button);
 
         Log.d(TAG, "onCreate");
         mActivity = this;
@@ -99,6 +107,48 @@ public class MainActivity extends AppCompatActivity
         MapFragment mapFragment = (MapFragment) getFragmentManager()
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
+
+        //button
+        button.setOnClickListener(new Button.OnClickListener(){
+            @Override
+            public void onClick(View v){
+                String str=editText.getText().toString();
+                List<Address> addressList = null;
+                try {
+                    // editText에 입력한 텍스트(주소, 지역, 장소 등)을 지오 코딩을 이용해 변환
+                    addressList = geocoder.getFromLocationName(
+                            str, // 주소
+                            10); // 최대 검색 결과 개수
+                }
+                catch (IOException e) {
+                    e.printStackTrace();
+                }
+
+                System.out.println(addressList.get(0).toString());
+                // 콤마를 기준으로 split
+                String []splitStr = addressList.get(0).toString().split(",");
+                String address = splitStr[0].substring(splitStr[0].indexOf("\"") + 1,splitStr[0].length() - 2); // 주소
+                System.out.println(address);
+
+                String latitude = splitStr[10].substring(splitStr[10].indexOf("=") + 1); // 위도
+                String longitude = splitStr[12].substring(splitStr[12].indexOf("=") + 1); // 경도
+                System.out.println(latitude);
+                System.out.println(longitude);
+
+                // 좌표(위도, 경도) 생성
+                LatLng point = new LatLng(Double.parseDouble(latitude), Double.parseDouble(longitude));
+                // 마커 생성
+                MarkerOptions mOptions2 = new MarkerOptions();
+                mOptions2.title("search result");
+                mOptions2.snippet(address);
+                mOptions2.position(point);
+                // 마커 추가
+                mGoogleMap.addMarker(mOptions2);
+                // 해당 좌표로 화면 줌
+                mGoogleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(point,15));
+            }
+
+        });
     }
 
 
@@ -164,15 +214,14 @@ public class MainActivity extends AppCompatActivity
 
 
     @Override
-    public void onMapReady(GoogleMap googleMap) {
+    public void onMapReady(final GoogleMap googleMap) {
 
         Log.d(TAG, "onMapReady :");
 
         mGoogleMap = googleMap;
-
+        geocoder = new Geocoder(this);
 
         //런타임 퍼미션 요청 대화상자나 GPS 활성 요청 대화상자 보이기전에
-        //지도의 초기위치를 서울로 이동
         setDefaultLocation();
 
         //mGoogleMap.getUiSettings().setZoomControlsEnabled(false);
@@ -192,8 +241,18 @@ public class MainActivity extends AppCompatActivity
 
             @Override
             public void onMapClick(LatLng latLng) {
-
-                Log.d( TAG, "onMapClick :");
+                MarkerOptions mOptions = new MarkerOptions();
+                // 마커 타이틀
+                mOptions.title("Marker points");
+                Double latitude = latLng.latitude; // 위도
+                Double longitude = latLng.longitude; // 경도
+                // 마커의 스니펫(간단한 텍스트) 설정
+                mOptions.snippet(latitude.toString() + ", " + longitude.toString());
+                // LatLng: 위도 경도 쌍을 나타냄
+                mOptions.position(new LatLng(latitude, longitude));
+                // 마커(핀) 추가
+                googleMap.addMarker(mOptions);
+                //Log.d( TAG, "onMapClick :");
             }
         });
 
@@ -223,7 +282,6 @@ public class MainActivity extends AppCompatActivity
             }
         });
     }
-
 
     @Override
     public void onLocationChanged(Location location) {
@@ -599,6 +657,8 @@ public class MainActivity extends AppCompatActivity
                 break;
         }
     }
+
+
 
 
 }
